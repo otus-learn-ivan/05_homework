@@ -38,6 +38,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./helloworld-0.1.${{ github.run_number }}-Linux.deb
-          asset_name: helloworld-0.1.${{ github.run_number }}-Linux.deb
+          asset_path: ./graphic_vector_editor_prg-0.1.${{ github.run_number }}-Linux.deb
+          asset_name: graphic_vector_editor_prg-0.1.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
