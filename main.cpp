@@ -199,8 +199,6 @@ struct Tquit_program{
 
 int main()
 {
-
-//#if 0
     system("clear");
     std::unique_ptr<Tdocument> drawing;
     Tscreen_txt_stream screen{std::cout,2};
@@ -225,5 +223,4 @@ int main()
             drawing->draw(screen);
         }
     }
-//#endif // 0
 }
