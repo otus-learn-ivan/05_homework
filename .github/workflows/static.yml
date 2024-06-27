@@ -41,7 +41,14 @@ jobs:
      # - name: Deploy to GitHub Pages
      #   id: deployment
      #   uses: actions/deploy-pages@v4
- # Create documentation   
+      # Install Doxygen
+      - name: Install Doxygen
+        run: sudo apt install doxygen && doxygen --version
+
+      - name: Install Graphviz
+        run: sudo apt install graphviz
+
+      # Create documentation   
       - name: Create documentation     
         run: doxygen
         
