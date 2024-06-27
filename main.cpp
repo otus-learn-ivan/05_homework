@@ -5,7 +5,10 @@
 #include <chrono>
 
 using namespace std;
-
+/**
+    \brief  Шаблонная функция получения данных с клавиатуры 
+	 \return Вектор данных типа Т
+*/
  template <typename T >
  std::vector<T> get_vector_value_from_in(){
    string line{};
@@ -16,18 +19,38 @@ using namespace std;
    return val;
  }
 //-------------------------------------------------------------
+/**
+    \brief  Метод вывода приметива Tcoordinate на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
 void Tcoordinate::draw(Tscreen_txt_stream& xout){
     xout.get_screen() << "("<< x <<","<< y<<")";
 }
+/**
+    \brief  Метод вывода приметива Tpoint на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
 void Tpoint::draw(Tscreen_txt_stream& xout){
     xout.get_screen() << "point";coordinate.draw(xout);xout.reset_tearing_layer();
 }
+/**
+    \brief  Метод вывода приметива Tline на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
 void Tline::draw(Tscreen_txt_stream& xout){
     xout.get_screen() << "line (begin: "; begin_line.draw(xout); xout.get_screen() << "  end: ";end_line.draw(xout); xout.get_screen() << ")";xout.reset_tearing_layer();
 }
+/**
+    \brief  Метод вывода приметива Tarc на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
 void Tarc::draw(Tscreen_txt_stream& xout){
       xout.get_screen()<< "arc (angle: " << angle <<",radius: " << radius << ",center: ";center.draw(xout); xout.get_screen() << ")";xout.reset_tearing_layer();
 }
+/**
+    \brief  Метод вывода приметива Tpoligon на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
 void Tpoligon::draw(Tscreen_txt_stream& xout){
     xout.get_screen() << "poligon";xout.reset_tearing_layer();
     Ttab_untab_screen_txt_stream to_right(xout);
@@ -35,15 +58,32 @@ void Tpoligon::draw(Tscreen_txt_stream& xout){
         xout.get_screen() << "id:" << primetiv.first << " - "; primetiv.second->draw(xout) ;//xout.reset_tearing_layer();
     }
 }
+/**
+    \brief  Метод вывода приметива Tdocument на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
 void Tdocument::draw(Tscreen_txt_stream& xout){
     xout.get_screen() << "Name: " << name << " type: " ;
     Tpoligon::draw(xout);
 }
 //---------------------------------------------------------------
+/**
+    \brief  Класс строки меню 
+*/
 struct MenuItem {
+/**
+    \brief  Поле заголовка меню 
+*/
     std::string title;
+/**
+    \brief  Обработчик вызываемый при выборе данного меню 
+	\param [in]  указатель на документ с котором необходимо выполнить действие  std::unique_ptr<Tdocument>
+*/
     std::function <std::unique_ptr<Tdocument>(std::unique_ptr<Tdocument>)> handler;
 };
+/**
+    \brief  Класс создания нового документа
+*/
 struct Tcreate_new_document{
     std::unique_ptr<Tdocument> operator()(std::unique_ptr<Tdocument> drawing){
         std::cout << "Tcreate_new_document\n";
@@ -54,6 +94,9 @@ struct Tcreate_new_document{
         return drawing;
     };
 };
+/**
+    \brief  Класс сохранения  документа в файл
+*/
 struct Timport_document_from_file{
     std::unique_ptr<Tdocument> operator()(std::unique_ptr<Tdocument> drawing){
         std::cout << "Timport_document_from_file\n";
@@ -66,6 +109,9 @@ struct Timport_document_from_file{
         return drawing;
     };
 };
+/**
+    \brief  Класс чтения  документа из файла
+*/
 struct Texport_document_to_file{
     std::unique_ptr<Tdocument> operator()(std::unique_ptr<Tdocument> drawing){
         std::cout << "Texport_document_to_file\n";
@@ -82,6 +128,9 @@ struct Texport_document_to_file{
     };
 };
 
+/**
+    \brief  Класс добавления графического примитива в документ
+*/
 struct Tcreate_gprimetivew{
     std::unique_ptr<Tdocument> operator()(std::unique_ptr<Tdocument> drawing){
         if(!drawing){
@@ -113,6 +162,9 @@ struct Tcreate_gprimetivew{
         return drawing;
     };
 };
+/**
+    \brief  Класс удаления графического примитива из документа
+*/
 struct Tdelete_gprimetivew{
     std::unique_ptr<Tdocument> operator()(std::unique_ptr<Tdocument> drawing){
         std::cout << "Tdelete_gprimetivew\n";
@@ -126,7 +178,9 @@ struct Tdelete_gprimetivew{
         return drawing;
     };
 };
-
+/**
+    \brief  Класс выхода из программы и при желании сохранения  документа в файл
+*/
 struct Tquit_program{
     std::unique_ptr<Tdocument> operator()(std::unique_ptr<Tdocument> drawing){
         std::cout << "Tquit_program\n";

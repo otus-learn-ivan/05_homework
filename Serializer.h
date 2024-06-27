@@ -4,7 +4,9 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-
+/**
+    \brief  Интерфейс  сериализатора графического премитива 
+*/
 class ISerializer
 {
     public:
@@ -13,7 +15,9 @@ class ISerializer
         virtual void serializeString(const std::string& data) = 0;
         virtual void deserializeString(std::string& data) = 0;
 };
-// Реализация сериализации с помощью boost::serialization
+/**
+    \brief  Класс реализации сериализатора графического премитива  с помощью boost::serialization
+*/
 class BoostSerializer : public ISerializer {
     std::ostream* os;
     std::istream* is;

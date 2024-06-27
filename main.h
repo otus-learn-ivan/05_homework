@@ -20,6 +20,11 @@
 #include "Serializer.h"
 #include <fstream>
 
+/**
+    \brief Шаблонный класс предоставляющий поток для вывода текстовой информации
+
+    \tparam T -  тип потока
+*/
 template <typename T>
 class Tscreen{
    T& screen;
@@ -27,6 +32,10 @@ public:
    Tscreen(T& screen):screen(screen){}
    virtual T& get_screen(){return screen;}
 };
+
+/**
+    \brief Класс текстового экрана для вывода крафических приметивов с требуемыми отступами иерархии
+*/
 
 class Tscreen_txt_stream:public Tscreen <std::ostream>{
    int needed_layer_number;
@@ -45,24 +54,49 @@ class Tscreen_txt_stream:public Tscreen <std::ostream>{
    int current_layer(){return current_layer_number;}
    void up_needed_layer(){needed_layer_number++;}
    void down_needed_layer(){if(needed_layer_number)needed_layer_number--;}
+   
+/**
+    \brief Функция возврощает текстовый поток с требуемым уровнем иерархии 
+*/
     std::ostream& get_screen(){
         return Tscreen<std::ostream>::get_screen() << std::string(tearing_layer(),' ');
     }
 };
+
+/**
+    \brief Класс инкремента и декремента уровня иерархии в парадигме RAII 
+*/
 struct Ttab_untab_screen_txt_stream{
     Tscreen_txt_stream &screen;
     Ttab_untab_screen_txt_stream(Tscreen_txt_stream &screen):screen(screen){screen.up_needed_layer();}
     ~Ttab_untab_screen_txt_stream(){screen.down_needed_layer();}
 };
 
-
+/**
+    \brief  Интерфейс графического премитива 
+*/
 class Tprimetiv{
     public:
+/**
+    \brief  Метод вывода приметива на текстовый экран  
+	 \param [in] xout текстовый экран на котором необходимо вывести приметив 
+*/
     virtual void draw(Tscreen_txt_stream& xout) =0;
+/**
+    \brief  Метод сериализации приметива ( например сохранения в файл)  
+	 \param [in] сериализатор
+*/
     virtual void serialize(ISerializer&) =0;
+/**
+    \brief  Метод десериализации приметива ( например чтения из файла)  
+	 \param [in] сериализатор
+*/
     virtual void deserialize(ISerializer&) =0;
 };
 
+/**
+    \brief  Класс графического премитива - координата 
+*/
 class Tcoordinate:public Tprimetiv{
     int x,y;
     public:
@@ -73,6 +107,9 @@ class Tcoordinate:public Tprimetiv{
     virtual void deserialize(ISerializer&)override;
 };
 
+/**
+    \brief  Класс графического премитива - точка 
+*/
 class Tpoint:public Tprimetiv{
     Tcoordinate coordinate;
     public:
@@ -82,7 +119,9 @@ class Tpoint:public Tprimetiv{
     virtual void serialize(ISerializer&)override;
     virtual void deserialize(ISerializer&)override;
 };
-
+/**
+    \brief  Класс графического премитива - линия. 
+*/
 class Tline:public Tprimetiv{
     Tcoordinate begin_line;
     Tcoordinate end_line;
@@ -94,6 +133,9 @@ class Tline:public Tprimetiv{
     virtual void deserialize(ISerializer&)override;
 };
 
+/**
+    \brief  Класс графического премитива - дуга. 
+*/
 class Tarc:public Tprimetiv{
     int angle;
     int radius;
@@ -105,7 +147,9 @@ class Tarc:public Tprimetiv{
     virtual void serialize(ISerializer&)override;
     virtual void deserialize(ISerializer&)override;
 };
-
+/**
+    \brief  Класс графического премитива - полигон - может содержать группу графических приметивов и полигонов.
+*/
 class Tpoligon:public Tprimetiv{
     int id_primetives;
     std::map<int,std::unique_ptr<Tprimetiv>> primetives;
@@ -117,9 +161,15 @@ class Tpoligon:public Tprimetiv{
         std::swap(id_primetives,other.id_primetives);
         std::swap(primetives,other.primetives);
     }
+/**
+    \brief  Метод добавления графического премитива в полигон .
+*/
     void add_primetives(std::unique_ptr<Tprimetiv> primetiv){
         primetives[id_primetives++] = std::move(primetiv);
     }
+/**
+    \brief  Метод удаления графического премитива из полигона .
+*/
     void delete_primetives(int delet_id_primetives){
         if(delet_id_primetives>id_primetives) return;
         primetives.erase(delet_id_primetives);
@@ -129,6 +179,9 @@ class Tpoligon:public Tprimetiv{
     virtual void deserialize(ISerializer&)override;
 };
 
+/**
+    \brief  Класс Документ - верхний в иерархии. Содержит все приметивы текущиго открытого файла.
+*/
 class Tdocument: public Tpoligon{
     std::string name;
     public:
@@ -139,7 +192,9 @@ class Tdocument: public Tpoligon{
     virtual void serialize(ISerializer&)override;
     virtual void deserialize(ISerializer&)override;
 };
-
+/**
+    \brief  Класс Фабрика создания  std::unique_ptr по входному типу графичесгого приметива
+*/
 class TfactoryPrimetives{
     public:
     template<class T>
